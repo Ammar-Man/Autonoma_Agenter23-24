@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 7ee54073b64a26945b1af4b93c448ea6
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - CarPf: {instanceID: 0}
+  - SpawnPoint: {instanceID: 0}
+  - RandowmCarsTag: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
