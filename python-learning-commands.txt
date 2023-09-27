@@ -1,0 +1,39 @@
+# to see your enviroment name :
+conda info --envs
+
+#to start conda 
+conda activate mlagents2 
+then you get this >(mlagents2) D:\2024\Period 1\Autonoma Agenter\lektion 3\EXEMPEL 2\Training>
+
+# need to install mlagents2
+pip install mlagents==0.30
+
+# to start game first time 
+mlagents-learn config.yml
+
+#then to start game secund time 
+mlagents-learn config.yml --force
+
+#Behavior paramters 
+Behavior Name "GateAI" and config.yml name shuod be same 
+
+#When using the ML-Agents CLI or API:
+mlagents-learn config.yml --run-id MyAi --train
+
+
+#mlagents.trainers.exception.UnityTrainerException: Previous data from this run ID was found. #Either specify a new run ID, 
+use --resume to resume this run, 
+or use the --force parameter to overwrite existing data.
+
+#error type 
+mlagents.trainers.settings.RewardSignalType, mlagents.trainers.settings.RewardSignalSettings
+
+
+mlagents-learn config.yml--run-id="MyAi"
+
+mlagents-learn pathToYamlFile --run-id="MyAi" --env=pathToExeFile --width=512 --height=512 --time-scale= 10
+mlagents-learn config.yml --run-id="MyAi-1" --env=
+
+mlagents-learn config.yml --run-id="MyAi-1" --env="D:\2024\Period 1\Autonoma Agenter\lektion 3\Exemple 4 Egen\Training\newBuild\Exemple 3 auto drive car.exe" --width=512 --height=512 --time-scale= 10
+
+mlagents-learn config.yml --run-id="MyAi-1" --env="D:\2024\Period 1\Autonoma Agenter\lektion 3\Exemple 4 Egen\Training\newBuild\Exemple 3 auto drive car.exe" --width=512 --height=512 --time-scale= 10

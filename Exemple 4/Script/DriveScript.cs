@@ -22,6 +22,8 @@ public class DriveScript : Agent
    public float carSpeed;
    public float updatedDistance;
     public float startDistance = 0;
+    public GameObject Waypoint;
+    Quaternion StartingRotation;
 
     //public GameObject Cylinder;
     // GameObject[] AllCylinder; 
@@ -41,17 +43,23 @@ public class DriveScript : Agent
     
     public override void CollectObservations(VectorSensor sensor)
     {
-      //  base.CollectObservations(sensor);
-        sensor.AddObservation(transform.position);
-        sensor.AddObservation(tresure.transform.position);
+
+        //Observera att vår kurslärare inte testat att alla dessa observationsvärden verkligen behövs :) Experimentera gärna på egen hand :)
+
+        sensor.AddObservation(transform.localPosition); //bilens position (3 x float)
+        sensor.AddObservation(Waypoint.transform.localPosition); //vägpunktens position (3 x float)
+        sensor.AddObservation(m_Rigidbody.velocity); //bilens hastighet (3 x float)
+        sensor.AddObservation(Vector3.Distance(transform.localPosition, Waypoint.transform.localPosition)); //avståndet mellan bilen och vägpunkten (1 x float)
+        sensor.AddObservation(transform.rotation); //bilens rotationsvinkel (4 x float)
+        //Som observationsvärden skickar vi totalt 14 flyttalsvärden till neuronnätet. Denna inställning bör göras i Behavour Parameter skriptet för agenten. 
     }
-    
+
 
     void Start()
     {
        // GameObject[] allCylinders = GameObject.FindGameObjectsWithTag("Cylinder");
         StartPosition = transform.localPosition;
-          
+          StartingRotation = transform.localRotation;
         Debug.Log("Start");
         m_Rigidbody = GetComponent<Rigidbody>();
 
@@ -77,7 +85,9 @@ public class DriveScript : Agent
     void Reset()
     {
         transform.localPosition = StartPosition;
-        this.transform.Translate(0, 0, 0);
+        transform.rotation =StartingRotation;
+        m_Rigidbody.velocity.Set(0, 0, 0);
+        
 
     }
     float getGoalDistance(GameObject name)
@@ -104,6 +114,12 @@ public class DriveScript : Agent
             Debug.Log("Distance decreased! Current score: 0.1f");
             startDistance = updatedDistance;
         }
+        if (updatedDistance > startDistance)
+        {
+            AddReward(-0.1f); // Lägg till poäng om agenten rör sig närmare målet
+            Debug.Log("Distance decreased! Current score: -0.1f");
+            startDistance = updatedDistance;
+        }
 
     }
 
@@ -128,11 +144,11 @@ public class DriveScript : Agent
 
     void leftDrive()
     {
-        this.transform.Rotate(0, - turnSpeed, speed);
+        this.transform.Rotate(0, - turnSpeed, 0);
     }
     void RightDrive()
     {
-        this.transform.Rotate(0, turnSpeed, speed);
+        this.transform.Rotate(0, turnSpeed, 0);
     }
     void DriveForward()
     {
@@ -186,8 +202,27 @@ public class DriveScript : Agent
 
 
     }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "wall")
+        {
+            Debug.Log("AddReward(-2.0f)");
+            // Destroy(this.gameObject);
+            AddReward(-2.0f);
+            EndEpisode();
+        }
+        else if (other.gameObject.tag == "waypoint")
+        {
+            // RandomPosition();
 
-     private void OnCollisionExit(Collision other)
+            AddReward(10.0f);
+            Debug.Log("AddReward(10.0f)");
+            EndEpisode();
+        }
+
+    }
+
+    private void OnCollisionExit(Collision other)
  {
 
      if (other.gameObject.tag == "plane")
