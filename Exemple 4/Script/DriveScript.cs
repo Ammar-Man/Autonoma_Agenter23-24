@@ -1,19 +1,23 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using TMPro;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class DriveScript : Agent
 {
     // Start is called before the first frame update
     Vector3 StartPosition;
+    Vector3 PointStartPosition;
     float speed = 0.2f;
     float turnSpeed = 1.0f;
     public float AddForceSpeed = 20f;
+    public float maxSpeed = 20.0f;
     Rigidbody m_Rigidbody;
     public GameObject GoalDistanse;
     public GameObject StartDistance;
@@ -24,6 +28,9 @@ public class DriveScript : Agent
     public float startDistance = 0;
     public GameObject Waypoint;
     Quaternion StartingRotation;
+    GameObject[] point;
+
+ 
 
     //public GameObject Cylinder;
     // GameObject[] AllCylinder; 
@@ -33,12 +40,13 @@ public class DriveScript : Agent
         // Debug.Log("Lyssnar");
         //getGoalDistance(GoalDistanse);
         AddReward(-0.0025f);
+        
         var discreteActions = actions.DiscreteActions;
         if (discreteActions[0] == 1) { DriveForward(); Score_Closer_To_Goal(); }
         if (discreteActions[0] == 2) { DriveBackwards(); Score_Closer_To_Goal(); } 
         if (discreteActions[1] == 1) {leftDrive(); Score_Closer_To_Goal(); }
         if (discreteActions[1] == 2){ RightDrive(); Score_Closer_To_Goal(); }
-
+        
     }
     
     public override void CollectObservations(VectorSensor sensor)
@@ -57,9 +65,24 @@ public class DriveScript : Agent
 
     void Start()
     {
-       // GameObject[] allCylinders = GameObject.FindGameObjectsWithTag("Cylinder");
+        point = GameObject.FindGameObjectsWithTag("point");
+
+        // GameObject[] allCylinders = GameObject.FindGameObjectsWithTag("Cylinder");
         StartPosition = transform.localPosition;
-          StartingRotation = transform.localRotation;
+        
+        if (point.Length > 0)
+        {
+            PointStartPosition = point[0].transform.localPosition;
+        }
+        
+      /*  foreach (GameObject index in point)
+
+        {
+           
+            PointStartPosition = index.transform.localPosition;
+        }*/
+
+        StartingRotation = transform.localRotation;
         Debug.Log("Start");
         m_Rigidbody = GetComponent<Rigidbody>();
 
@@ -86,8 +109,20 @@ public class DriveScript : Agent
     {
         transform.localPosition = StartPosition;
         transform.rotation =StartingRotation;
-        m_Rigidbody.velocity.Set(0, 0, 0);
-        
+        m_Rigidbody.velocity= Vector3.zero;
+        /*
+        foreach (GameObject index in point)
+
+        {
+            index.transform.localPosition = PointStartPosition;
+        }
+        */
+        if (point.Length > 0)
+        {
+            
+            point[0].transform.localPosition = PointStartPosition;
+        }
+
 
     }
     float getGoalDistance(GameObject name)
@@ -111,13 +146,13 @@ public class DriveScript : Agent
         if (updatedDistance < startDistance)
         {
             AddReward(0.1f); // Lägg till poäng om agenten rör sig närmare målet
-            Debug.Log("Distance decreased! Current score: 0.1f");
+            //Debug.Log("Distance decreased! Current score: 0.1f");
             startDistance = updatedDistance;
         }
         if (updatedDistance > startDistance)
         {
             AddReward(-0.1f); // Lägg till poäng om agenten rör sig närmare målet
-            Debug.Log("Distance decreased! Current score: -0.1f");
+           // Debug.Log("Distance decreased! Current score: -0.1f");
             startDistance = updatedDistance;
         }
 
@@ -144,17 +179,28 @@ public class DriveScript : Agent
 
     void leftDrive()
     {
-        this.transform.Rotate(0, - turnSpeed, 0);
+        this.transform.Rotate(0, - turnSpeed , 0);
     }
     void RightDrive()
     {
-        this.transform.Rotate(0, turnSpeed, 0);
+        this.transform.Rotate(0, turnSpeed , 0);
     }
     void DriveForward()
     {
         m_Rigidbody = GetComponent<Rigidbody>();
-        m_Rigidbody.AddForce(transform.forward * AddForceSpeed);
-        //this.transform.Translate(0, 0, speed);
+
+        // Check the current speed
+        float currentSpeed = m_Rigidbody.velocity.magnitude;
+
+        // If the current speed is below the maximum speed limit, add force
+        if (currentSpeed < maxSpeed)
+        {
+            // Calculate the force needed to reach the maximum speed
+            Vector3 force = transform.forward * (maxSpeed - currentSpeed);
+
+            // Apply the force to the rigidbody
+            m_Rigidbody.AddForce(force, ForceMode.VelocityChange);
+        }
 
     }
     void DriveBackwards()
@@ -164,6 +210,7 @@ public class DriveScript : Agent
         //this.transform.Translate(0, 0, speed);
 
     }
+  
 
     void RandomPosition()
     {
@@ -179,6 +226,13 @@ public class DriveScript : Agent
             float z = UnityEngine.Random.Range(70, 150);
             cylinder.transform.localPosition = new Vector3(x, transform.localPosition.y, z);
         }
+    }
+    void otherRandomPosition(Collider name)
+    {
+        float x = UnityEngine.Random.Range(-30, 4);
+        float z = UnityEngine.Random.Range(70, 150);
+        name.transform.localPosition = new Vector3(x, transform.localPosition.y, z);
+
     }
     private void OnCollisionEnter(Collision other)
     {
@@ -201,22 +255,38 @@ public class DriveScript : Agent
 
 
 
+
     }
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "wall")
         {
+          
             Debug.Log("AddReward(-2.0f)");
+            
             // Destroy(this.gameObject);
             AddReward(-2.0f);
             EndEpisode();
         }
+        if (other.gameObject.tag == "point")
+        {
+            // RandomPosition();
+            
+            AddReward(0.5f);
+            otherRandomPosition(other);
+          //  Destroy(other.gameObject);
+
+            Debug.Log("AddReward(5.0f)");
+            
+
+        }
+
         else if (other.gameObject.tag == "waypoint")
         {
             // RandomPosition();
 
-            AddReward(10.0f);
-            Debug.Log("AddReward(10.0f)");
+            AddReward(20.0f);
+            Debug.Log("AddReward(20.0f)");
             EndEpisode();
         }
 
@@ -228,7 +298,9 @@ public class DriveScript : Agent
      if (other.gameObject.tag == "plane")
      {
             Debug.Log("out of plane");
+            m_Rigidbody.velocity.Set(0, 0, 0);
             EndEpisode();
+           
      }
  }
 
