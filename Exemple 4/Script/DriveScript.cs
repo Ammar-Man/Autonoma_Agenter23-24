@@ -42,10 +42,12 @@ public class DriveScript : Agent
         AddReward(-0.0025f);
         
         var discreteActions = actions.DiscreteActions;
-        if (discreteActions[0] == 1) { DriveForward(); Score_Closer_To_Goal(); }
-        if (discreteActions[0] == 2) { DriveBackwards(); Score_Closer_To_Goal(); } 
-        if (discreteActions[1] == 1) {leftDrive(); Score_Closer_To_Goal(); }
-        if (discreteActions[1] == 2){ RightDrive(); Score_Closer_To_Goal(); }
+        if (discreteActions[0] == 1) { DriveForward();//    Score_Closer_To_Goal();
+        }
+        if (discreteActions[0] == 2) { DriveBackwards();  //    Score_Closer_To_Goal();
+        }
+        if (discreteActions[1] == 1) {leftDrive();  }
+        if (discreteActions[1] == 2){ RightDrive(); }
         
     }
     
@@ -69,34 +71,42 @@ public class DriveScript : Agent
 
         // GameObject[] allCylinders = GameObject.FindGameObjectsWithTag("Cylinder");
         StartPosition = transform.localPosition;
-        
-        if (point.Length > 0)
-        {
-            PointStartPosition = point[0].transform.localPosition;
-        }
-        
-      /*  foreach (GameObject index in point)
-
-        {
-           
-            PointStartPosition = index.transform.localPosition;
-        }*/
-
         StartingRotation = transform.localRotation;
         Debug.Log("Start");
         m_Rigidbody = GetComponent<Rigidbody>();
-
-         
         startDistance = getGoalDistance(GoalDistanse);
     }
 
     // Update is called once per frame
+    float trainingTimer = 0;
     private void FixedUpdate()
     {
-        var vel = m_Rigidbody.velocity;    
+      
+        updatedDistance = getGoalDistance(GoalDistanse);
 
-       
+        if (updatedDistance < startDistance)
+        {
+            AddReward(0.1f); // Lägg till poäng om agenten rör sig närmare målet
+            Debug.Log("updatedDistance: +0.1f");
+            trainingTimer = 0;
+            startDistance = updatedDistance;
+        }
+        else
+        {
+            // Annars om den inte blivit bättre så öka countern.
+            trainingTimer++;
+            
+            AddReward(-0.1f);
+            Debug.Log(trainingTimer + "AddReward(-0.0001f)");
+        }
+        if (trainingTimer > 500)
+        {
+            Debug.Log("EndEpisode");
+            trainingTimer = 0;
+            EndEpisode();
+        }
 
+        var vel = m_Rigidbody.velocity;
         carPosition = this.transform.position;
         carSpeed = vel.magnitude;
         RequestDecision();
@@ -110,37 +120,16 @@ public class DriveScript : Agent
         transform.localPosition = StartPosition;
         transform.rotation =StartingRotation;
         m_Rigidbody.velocity= Vector3.zero;
-        /*
-        foreach (GameObject index in point)
-
-        {
-            index.transform.localPosition = PointStartPosition;
-        }
-        */
-        if (point.Length > 0)
-        {
-            
-            point[0].transform.localPosition = PointStartPosition;
-        }
-
-
     }
     float getGoalDistance(GameObject name)
     {
         float dist = Vector3.Distance(transform.position, name.transform.position);
-        // print(f"Distance to other: {name} " + dist);
-        // Debug.Log($"Distance to {name}: {dist}");
         return dist;
 
     }
    
     void Score_Closer_To_Goal()
     {
-
-        //Debug.Log(dist);
-        // start 100 
-        // mål = 99 
-        // if (start < mål){ udate start }
         updatedDistance = getGoalDistance(GoalDistanse);
 
         if (updatedDistance < startDistance)
@@ -205,9 +194,15 @@ public class DriveScript : Agent
     }
     void DriveBackwards()
     {
-        m_Rigidbody = GetComponent<Rigidbody>();
-        m_Rigidbody.AddForce(transform.forward * AddForceSpeed *-1);
-        //this.transform.Translate(0, 0, speed);
+        float currentSpeed = m_Rigidbody.velocity.magnitude;
+        // If the current speed is below the maximum speed limit, add force
+        if (currentSpeed < maxSpeed)
+        {
+            // Calculate the force needed to reach the maximum speed
+            Vector3 force = transform.forward * (maxSpeed - currentSpeed);
+            // Apply the force to the rigidbody
+            m_Rigidbody.AddForce(force*-1, ForceMode.VelocityChange);
+        }
 
     }
   
@@ -234,29 +229,7 @@ public class DriveScript : Agent
         name.transform.localPosition = new Vector3(x, transform.localPosition.y, z);
 
     }
-    private void OnCollisionEnter(Collision other)
-    {
-
-        if (other.gameObject.tag == "wall")
-        {
-            Debug.Log("AddReward(-2.0f)");
-            // Destroy(this.gameObject);
-            AddReward(-2.0f);
-            EndEpisode();
-        }
-        else if (other.gameObject.tag =="waypoint" )
-        {
-            // RandomPosition();
-           
-            AddReward(10.0f);
-            Debug.Log("AddReward(10.0f)");
-            EndEpisode();
-        }
-
-
-
-
-    }
+  
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "wall")
@@ -285,8 +258,8 @@ public class DriveScript : Agent
         {
             // RandomPosition();
 
-            AddReward(20.0f);
-            Debug.Log("AddReward(20.0f)");
+            AddReward(10.0f);
+            Debug.Log("AddReward(10.0f)");
             EndEpisode();
         }
 
