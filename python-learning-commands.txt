@@ -5,6 +5,12 @@ conda info --envs
 conda activate mlagents2 
 then you get this >(mlagents2) D:\2024\Period 1\Autonoma Agenter\lektion 3\EXEMPEL 2\Training>
 
+#to training dir
+cd /d D:\2024\Period 1\Autonoma Agenter\lektion 3\Exemple 4 Egen\Training
+
+#visa visualisering resultat 
+tensorboard --logdir results --port 5004
+
 # need to install mlagents2
 pip install mlagents==0.30
 
@@ -31,9 +37,26 @@ mlagents.trainers.settings.RewardSignalType, mlagents.trainers.settings.RewardSi
 
 mlagents-learn config.yml--run-id="MyAi"
 
-mlagents-learn pathToYamlFile --run-id="MyAi" --env=pathToExeFile --width=512 --height=512 --time-scale= 10
+mlagents-learn pathToYamlFile --run-id="MyAi-5" --env=pathToExeFile --width=512 --height=512 --time-scale=10 --resume
+
 mlagents-learn config.yml --run-id="MyAi-1" --env=
 
 mlagents-learn config.yml --run-id="MyAi-1" --env="D:\2024\Period 1\Autonoma Agenter\lektion 3\Exemple 4 Egen\Training\newBuild\Exemple 3 auto drive car.exe" --width=512 --height=512 --time-scale= 10
 
 mlagents-learn config.yml --run-id="MyAi-1" --env="D:\2024\Period 1\Autonoma Agenter\lektion 3\Exemple 4 Egen\Training\newBuild\Exemple 3 auto drive car.exe" --width=512 --height=512 --time-scale= 10
+
+mlagents-learn config.yml --run-id="MyAi-1" --env="D:\2024\Period 1\Autonoma Agenter\lektion 3\Exemple 4 Egen\Training\newBuild\Exemple 3 auto drive car.exe" --width=512 --height=300 --resume
+
+#nysta version
+mlagents-learn config.yml --run-id="MyAi-5" --env="D:\2024\Period 1\Autonoma Agenter\lektion 3\Exemple 4 Egen\Training\newBuild\Exemple 3 auto drive car.exe" --width=512 --height=300 --resume
+
+# 10 gånger snabbare 
+mlagents-learn config.yml --run-id="MyAi-6" --env=pathToExeFile --width=512 --height=300 --resume
+
+# 10 gånger snabbare med skärm
+mlagents-learn config.yml --run-id="MyAi-6" --env="D:\2024\Period 1\Autonoma Agenter\lektion 3\Exemple 4 Egen\Training\newBuild\Exemple 3 auto drive car.exe" --width=512 --height=300 --time-scale=10
+
+# 100 gånger snabbare utan screen
+mlagents-learn config.yml --run-id="MyAi-6" --env="D:\2024\Period 1\Autonoma Agenter\lektion 3\Exemple 4 Egen\Training\newBuild\Exemple 3 auto drive car.exe" --no-graphics --time-scale=10 --num-envs=10 --resume
+
+mlagents-learn config.yml --run-id="MyAi-7" --env="D:\2024\Period 1\Autonoma Agenter\lektion 3\Exemple 4 Egen\Training\newBuild\Exemple 3 auto drive car.exe" --no-graphics --time-scale=10 --num-envs=10 --resume
