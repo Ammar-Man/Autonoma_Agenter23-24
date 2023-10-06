@@ -21,11 +21,8 @@ public class RobotController : MonoBehaviour
     public GameObject Box;
     public GameObject Target;
     public GameObject Magnet;
-
-    private GameObject MagnetField;
-    private Magnet MagnetScript;
     PincherController pincherController;
-    public bool ON = false;
+    public bool NO = false;
     public bool MagnetOn = true;
 
     public float updatedDistanceToTarget;
@@ -37,75 +34,70 @@ public class RobotController : MonoBehaviour
     public float BoxDistance;
     public float StartDistanseToBox;
 
-    public bool isTargetInHand = false;
+    public bool TargetInHand = false;
     public bool IfTarget = false;
     public bool IfBox = false;
 
     private void Start()
     {
-        RandomPosition(Box, Target);
+        // RandomPosition(Box, Target);
         MagnetOn = true;
-        InitializeMagnet();
+        pincherController = Hand.GetComponent<PincherController>();
 
-
+       GameObject MS = GameObject.Find("Magnet fild");
+        Magnet scriptM = MS.GetComponent<Magnet>();
+        scriptM.MoveTargetToMagnet(NO);
+        StartDistanseToTarget = GetDistanceForTwo(Magnet, Target);
+        StartDistanseToBox = GetDistanceForTwo(Magnet, Box);
+        
     }
     private void Update()
     {
-        HandleMagnetLogic();
-        CheckCollisions();
-    }
-    private void InitializeMagnet()
-    {
-        pincherController = Hand.GetComponent<PincherController>();
-        MagnetField = GameObject.Find("Magnet fild");
-        MagnetScript = MagnetField.GetComponent<Magnet>();
-        MagnetScript.MoveTargetToMagnet(ON);
-        StartDistanseToTarget = GetDistanceForTwo(Magnet, Target);
-        StartDistanseToBox = GetDistanceForTwo(Magnet, Box);
-    }
-    private void HandleMagnetLogic()
-    {
+        GameObject MS = GameObject.Find("Magnet fild");
+        Magnet scriptM = MS.GetComponent<Magnet>();
         ManualControl();
-        MagnetScript.MoveTargetToMagnet(ON);
-        MagnetScript.callON = MagnetOn;
+        scriptM.MoveTargetToMagnet(NO);
+        
+        IfTarget = scriptM.IfTarget;
+        IfBox = scriptM.IfBox;
+        scriptM.callON = MagnetOn;
 
-        BoxDistance = GetDistanceForTwo(Magnet, Box);
-        TargetDistance = GetDistanceForTwo(Magnet, Target);
-    }
+        BoxDistance = GetDistanceForTwo(Magnet,Box);
+        TargetDistance = GetDistanceForTwo(Magnet,Target);
 
-        private void CheckCollisions()
-    {
-        bool PageDown = Input.GetKeyDown(KeyCode.PageDown);
-        IfTarget = MagnetScript.IfTarget;
-        IfBox = MagnetScript.IfBox;
-
-
-        if (!IfTarget) { MagnetOn = true; }
 
         if (IfTarget)
         {
-          //  Debug.Log(" go Target: 0.001f");
-
+            Debug.Log(" go Target: 0.001f");
+           
         }
 
         if (IfTarget && IfBox)
         {
-           // Debug.Log(" go Target: 0.001f");
+            Debug.Log(" go Target: 0.001f");
 
         }
 
 
-        if (isTargetInHand)
+        if (TargetInHand )
         {
             Debug.Log("Target in hand: 2 f");
-            isTargetInHand = false;
+            TargetInHand =false;
         }
-     
+
+        if (scriptM.CompareTag("Target"))
+        {
+            Debug.Log("Magnet colliderat med Target!! ;)");
+            // Code to handle when the object has the "Target" tag
+        }
+
+        // GoToTarget();
     }
 
-        public void ManualControl()
+
+    public void ManualControl()
     {
-        bool PageDown = Input.GetKeyDown(KeyCode.PageDown);
+
         bool anyKeyPressed = Input.GetKeyDown(KeyCode.RightArrow) ||
                         Input.GetKeyDown(KeyCode.LeftArrow) ||
                         Input.GetKeyDown(KeyCode.DownArrow) ||
@@ -120,7 +112,7 @@ public class RobotController : MonoBehaviour
                         Input.GetKeyDown(KeyCode.F) ||
                         Input.GetKeyDown(KeyCode.T) ||
                         Input.GetKeyDown(KeyCode.G) ||
-                       // Input.GetKeyDown(KeyCode.PageUp) ||
+                        Input.GetKeyDown(KeyCode.PageUp) ||
                         Input.GetKeyDown(KeyCode.PageDown);
 
         if (anyKeyPressed)
@@ -133,20 +125,12 @@ public class RobotController : MonoBehaviour
                 GoToBox();
             }  
         }
-        if(PageDown && IfBox && IfTarget)
+        if(Input.GetKeyDown(KeyCode.PageDown) && IfBox && IfTarget)
         {
-            Debug.Log("5");
             Debug.Log("EndEpisod()");
         }
 
-        if (PageDown && IfTarget )
-        {
-            Debug.Log("-2");
-          
-        }
-     
-
-
+       
         if (Input.GetKeyDown(KeyCode.RightArrow))
             RotateJoint(0, RotationDirection.Positive);
         if (Input.GetKeyUp(KeyCode.RightArrow))
@@ -209,15 +193,10 @@ public class RobotController : MonoBehaviour
             RotateJoint(6, RotationDirection.Negative);
         if (Input.GetKeyUp(KeyCode.G))
             RotateJoint(6, RotationDirection.None);
-       /*if (Input.GetKeyDown(KeyCode.PageUp))
+        if (Input.GetKeyDown(KeyCode.PageUp))
             MagnetOn = true;
-       */
-        if (Input.GetKeyDown(KeyCode.PageDown)) {
-            MagnetOn = false;
-           
-        }
-               
-       
+        if (Input.GetKeyDown(KeyCode.PageDown))
+                MagnetOn =  false;
 
     }
 
@@ -250,11 +229,16 @@ public class RobotController : MonoBehaviour
 
     void RandomPosition(GameObject one, GameObject two)
     {
-        Vector3 randomOffsetOne = new Vector3(UnityEngine.Random.Range(-0.4f, 0.4f), transform.localPosition.y, UnityEngine.Random.Range(-0.5f, 0.35f));
-        Vector3 randomOffsetTwo = new Vector3(UnityEngine.Random.Range(-0.4f, 0.4f), transform.localPosition.y, UnityEngine.Random.Range(-0.5f, -0.27f));
+        
+           float x = UnityEngine.Random.Range(-0.4f, 0.4f);
+          float z = UnityEngine.Random.Range(-0.5f, 0.35f);
+        one.transform.localPosition = new Vector3(x, transform.localPosition.y, z);
 
-        one.transform.localPosition = randomOffsetOne;
-        two.transform.localPosition = randomOffsetTwo;
+         x = UnityEngine.Random.Range(-0.4f, 0.4f);
+         z = UnityEngine.Random.Range(-0.5f, -0.27f);
+        two.transform.localPosition = new Vector3(x, transform.localPosition.y, z);
+
+
     }
 
 
@@ -267,22 +251,20 @@ public class RobotController : MonoBehaviour
     void GoToTarget()
     {
         updatedDistanceToTarget = GetDistanceForTwo(Magnet, Target);
-        if (IfTarget)
-        {
-            Debug.Log("Target with: 0.001f");
-            return;
-        }
+
+      
 
         if (updatedDistanceToTarget < StartDistanseToTarget)
         {
-            // AddReward(0.1f); // Lägg till poäng om agenten rör sig närmare målet
+  //          AddReward(0.1f); // Lägg till poäng om agenten rör sig närmare målet
             Debug.Log("go target : 0.1f");
             StartDistanseToTarget = updatedDistanceToTarget;
         }
-
         if (updatedDistanceToTarget > StartDistanseToTarget)
         {
             Debug.Log("- go target : -0.1f");
+//            AddReward(-0.1f); // Lägg till poäng om agenten rör sig närmare målet
+                              // Debug.Log("Distance decreased! Current score: -0.1f");
             StartDistanseToTarget = updatedDistanceToTarget;
         }
     }
@@ -292,25 +274,31 @@ public class RobotController : MonoBehaviour
 
         if (IfBox)
         {
-            Debug.Log("Box with: 0.001f");
+            Debug.Log(" If Box: 0.001f");
             return;
         }
 
         if (updatedDistanceToBox < StartDistanseToBox)
         {
+            //          AddReward(0.1f); // Lägg till poäng om agenten rör sig närmare målet
             Debug.Log("go box: 0.1f");
             StartDistanseToBox = updatedDistanceToBox;
         }
         if (updatedDistanceToBox > StartDistanseToBox)
         {
             Debug.Log("- go box: -0.1f");
+            //            AddReward(-0.1f); // Lägg till poäng om agenten rör sig närmare målet
+            // Debug.Log("Distance decreased! Current score: -0.1f");
             StartDistanseToBox = updatedDistanceToBox;
         }
 
         
     }
 
-
+    private void OnTriggerEnter(Collider other)
+    {
+  
+    }
 
 
 }
