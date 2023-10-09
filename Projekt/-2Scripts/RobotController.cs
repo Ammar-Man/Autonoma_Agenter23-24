@@ -17,16 +17,10 @@ public class RobotController : MonoBehaviour
     }
     public Joint[] joints;
 
-    /*
     public GameObject Hand;
     public GameObject Box;
     public GameObject Target;
     public GameObject Magnet;
-*/
-    private GameObject Hand;
-    private GameObject Box;
-    private GameObject Target;
-    private GameObject Magnet;
 
     private GameObject MagnetField;
     private Magnet MagnetScript;
@@ -43,18 +37,15 @@ public class RobotController : MonoBehaviour
     public float BoxDistance;
     public float StartDistanseToBox;
 
-
+    public bool isTargetInHand = false;
     public bool IfTarget = false;
     public bool IfBox = false;
 
     private void Start()
     {
-
-        FindGameObjectsByName();
-        InitializeMagnet();
         RandomPosition(Box, Target);
         MagnetOn = true;
-        
+        InitializeMagnet();
 
 
     }
@@ -63,24 +54,10 @@ public class RobotController : MonoBehaviour
         HandleMagnetLogic();
         CheckCollisions();
     }
-
-    private void FindGameObjectsByName()
-    {
-        MagnetField = GameObject.Find("Magnet_fild");
-        Hand = GameObject.Find("HandE"); // Replace "HandObjectName" with the actual name of your hand object
-        Box = GameObject.Find("BOX");   // Replace "BoxObjectName" with the actual name of your box object
-        Target = GameObject.Find("Cube"); // Replace "TargetObjectName" with the actual name of your target object
-        Magnet = GameObject.Find("Magnet_fild"); // Replace "MagnetObjectName" with the actual name of your magnet object
-
-        if (Hand == null || Box == null || Target == null || Magnet == null || MagnetField == null)
-        {
-            Debug.LogError("One or more game objects not found!");
-        }
-    }
-
     private void InitializeMagnet()
     {
         pincherController = Hand.GetComponent<PincherController>();
+        MagnetField = GameObject.Find("Magnet fild");
         MagnetScript = MagnetField.GetComponent<Magnet>();
         MagnetScript.MoveTargetToMagnet(ON);
         StartDistanseToTarget = GetDistanceForTwo(Magnet, Target);
@@ -88,7 +65,6 @@ public class RobotController : MonoBehaviour
     }
     private void HandleMagnetLogic()
     {
-       
         ManualControl();
         MagnetScript.MoveTargetToMagnet(ON);
         MagnetScript.callON = MagnetOn;
@@ -97,7 +73,7 @@ public class RobotController : MonoBehaviour
         TargetDistance = GetDistanceForTwo(Magnet, Target);
     }
 
-    private void CheckCollisions()
+        private void CheckCollisions()
     {
         bool PageDown = Input.GetKeyDown(KeyCode.PageDown);
         IfTarget = MagnetScript.IfTarget;
@@ -118,9 +94,16 @@ public class RobotController : MonoBehaviour
 
         }
 
+
+        if (isTargetInHand)
+        {
+            Debug.Log("Target in hand: 2 f");
+            isTargetInHand = false;
+        }
+     
     }
 
-    public void ManualControl()
+        public void ManualControl()
     {
         bool PageDown = Input.GetKeyDown(KeyCode.PageDown);
         bool anyKeyPressed = Input.GetKeyDown(KeyCode.RightArrow) ||
@@ -265,13 +248,13 @@ public class RobotController : MonoBehaviour
         jointController.rotationState = direction;
     }
 
-    void RandomPosition(GameObject box, GameObject target)
+    void RandomPosition(GameObject one, GameObject two)
     {
-        Vector3 randomOffsetBox = new Vector3(UnityEngine.Random.Range(-0.4f, 0.4f), transform.localPosition.y, UnityEngine.Random.Range(-0.5f, -0.3f));
-        Vector3 randomOffsetTarget = new Vector3(UnityEngine.Random.Range(-0.4f, 0.4f), transform.localPosition.y, UnityEngine.Random.Range(-0.5f, -0.27f));
+        Vector3 randomOffsetOne = new Vector3(UnityEngine.Random.Range(-0.4f, 0.4f), transform.localPosition.y, UnityEngine.Random.Range(-0.5f, 0.35f));
+        Vector3 randomOffsetTwo = new Vector3(UnityEngine.Random.Range(-0.4f, 0.4f), transform.localPosition.y, UnityEngine.Random.Range(-0.5f, -0.27f));
 
-        box.transform.localPosition = randomOffsetBox;
-        target.transform.localPosition = randomOffsetTarget;
+        one.transform.localPosition = randomOffsetOne;
+        two.transform.localPosition = randomOffsetTwo;
     }
 
 
