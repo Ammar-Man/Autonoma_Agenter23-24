@@ -1,0 +1,65 @@
+{
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.30.0",
+        "torch_version": "2.0.1+cpu"
+    },
+    "GateAIRobot": {
+        "checkpoints": [
+            {
+                "steps": 2999999,
+                "file_path": "results\\RobotTestBuild17\\GateAIRobot\\GateAIRobot-2999999.onnx",
+                "reward": 1.2236631119893373,
+                "creation_time": 1698756242.0898566,
+                "auxillary_file_paths": [
+                    "results\\RobotTestBuild17\\GateAIRobot\\GateAIRobot-2999999.pt"
+                ]
+            },
+            {
+                "steps": 3499997,
+                "file_path": "results\\RobotTestBuild17\\GateAIRobot\\GateAIRobot-3499997.onnx",
+                "reward": 0.5805461737148178,
+                "creation_time": 1698758129.7602646,
+                "auxillary_file_paths": [
+                    "results\\RobotTestBuild17\\GateAIRobot\\GateAIRobot-3499997.pt"
+                ]
+            },
+            {
+                "steps": 3553530,
+                "file_path": "results\\RobotTestBuild17\\GateAIRobot\\GateAIRobot-3553530.onnx",
+                "reward": 0.6704611427073056,
+                "creation_time": 1698758332.0495205,
+                "auxillary_file_paths": [
+                    "results\\RobotTestBuild17\\GateAIRobot\\GateAIRobot-3553530.pt"
+                ]
+            },
+            {
+                "steps": 3999999,
+                "file_path": "results\\RobotTestBuild17\\GateAIRobot\\GateAIRobot-3999999.onnx",
+                "reward": 1.0931499510654248,
+                "creation_time": 1698777469.8793616,
+                "auxillary_file_paths": [
+                    "results\\RobotTestBuild17\\GateAIRobot\\GateAIRobot-3999999.pt"
+                ]
+            },
+            {
+                "steps": 4210064,
+                "file_path": "results\\RobotTestBuild17\\GateAIRobot\\GateAIRobot-4210064.onnx",
+                "reward": 9.556400163797662,
+                "creation_time": 1698778349.4375312,
+                "auxillary_file_paths": [
+                    "results\\RobotTestBuild17\\GateAIRobot\\GateAIRobot-4210064.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 4210064,
+            "file_path": "results\\RobotTestBuild17\\GateAIRobot.onnx",
+            "reward": 9.556400163797662,
+            "creation_time": 1698778349.4375312,
+            "auxillary_file_paths": [
+                "results\\RobotTestBuild17\\GateAIRobot\\GateAIRobot-4210064.pt"
+            ]
+        }
+    }
+}

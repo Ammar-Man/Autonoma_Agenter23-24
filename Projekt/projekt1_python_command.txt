@@ -1,0 +1,22 @@
+#Finale projekt 
+cd /d D:\2024\Period 1\Autonoma Agenter\Projekt1\ArmRobot\Training
+
+#to start conda 
+conda activate mlagents2 
+
+#visa visualisering resultat 
+tensorboard --logdir results --port 5004
+
+#Start game in unity
+mlagents-learn config.yml --run-id="RobotTestBuild17" --time-scale=5  --resume
+
+# 10  med skärm
+mlagents-learn config.yml --run-id="RobotTestBuild17" --env="D:\2024\Period 1\Autonoma Agenter\Projekt1\ArmRobot\Training\build4\ArmRobot.exe" --width=800 --height=512 --time-scale=10 --num-envs=1 --resume
+ 
+# 10  utan skärm
+mlagents-learn config.yml --run-id="RobotTestBuild17" --env="D:\2024\Period 1\Autonoma Agenter\Projekt1\ArmRobot\Training\build4\ArmRobot.exe" --no-graphics --time-scale=5 --num-envs=5
+
+#build
+# 10 X 10 gånger snabbare utan screen
+mlagents-learn config.yml --run-id="RobotTestBuild17" --env="D:\2024\Period 1\Autonoma Agenter\Projekt1\ArmRobot\Training\build4\ArmRobot.exe" --no-graphics --time-scale=10 --num-envs=5 --resume
+
